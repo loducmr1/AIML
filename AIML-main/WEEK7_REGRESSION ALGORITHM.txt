@@ -1,0 +1,62 @@
+PROMPT 1
+
+import pandas as pd
+housing_data = pd.read_csv("/content/Housing.csv")
+
+PROMPT 2
+
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+PROMPT 3
+
+import math
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from sklearn.model_selection import learning_curve
+
+def data_preporcessing(data):
+  data_encoded = pd.get_dummies(data,drop_first=True)
+  print(data_encoded.head())
+  x = data_encoded.drop('price',axis=1)
+  y = data_encoded['price']
+  x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.3,random_state=42)
+  return x_train,x_test,y_train,y_test
+
+def plot_actual_vs_predicted(model,x_test,y_test):
+  y_pred = model.predict(x_test)
+  plt.figure(figsize=(10,6))
+  sns.scatterplot(x=y_test,y=y_pred)
+  plt.title("actual vs predicted prices")
+  plt.xlabel("actual prices")
+  plt.ylabel("predicted prices")
+  plt.plot([y_test.min(),y_test.max()],[y_test.min(),y_test.max()], 'm--')
+  plt.show()
+
+def train_model(x_train,y_train):
+  model = LinearRegression()
+  model.fit(x_train,y_train)
+  return model
+
+def plot_learning_curve(model,x,y):
+  train_sizes, train_scores, test_scores = learning_curve(
+      model, x, y, cv=5, train_sizes = np.linspace(0.1, 1.0, 10),
+      scoring="neg_mean_squared_error", shuffle=True)
+
+  train_mean = -np.mean(train_scores, axis = 1)
+  train_std = np.std(train_scores, axis = 1)
+  test_mean = -np.mean(test_scores, axis = 1)
+  test_std = np.std(test_scores, axis = 1)
+
+  plt.figure(figsize=(10,6))
+  plt.plot(train_sizes, train_mean, label="training error")
+  plt.fill_between(train_sizes, train_mean - train_std, train_mean + train_std,alpha = 0.2)
+  plt.plot(train_sizes, test_mean, label="validation error")
+  plt.fill_between(train_sizes, test_mean - test_std, test_mean + test_std, alpha = 0.2)
+  plt.xlabel("training set size")
+  plt.ylabel("mse")
+  plt.title("linear regeression - learning curve")
+  plt.legend()
+  plt.show()

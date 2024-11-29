@@ -1,0 +1,25 @@
+import sklearn, pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+
+iris = load_iris()
+df=pd.DataFrame(iris['data'])
+print(df)
+print(iris['target_names'])
+print(iris['feature_names'])
+print(iris['target'])
+x=df
+y=iris['target']
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.33,random_state=42)
+from sklearn.neighbors import KNeighborsClassifier
+knn=KNeighborsClassifier(n_neighbors=3)
+knn.fit(x_train,y_train)
+y_pred=knn.predict(x_test)
+print(f"Confusion matrix:\n",confusion_matrix(y_test,y_pred))
+print("Correct Prediction: ", accuracy_score(y_test,y_pred))
+print("Wrong Prediction: ", 1-accuracy_score(y_test,y_pred))
+y_testtrain = knn.predict(x_train)
+cml = confusion_matrix(y_train,y_testtrain)
+print(cml)
